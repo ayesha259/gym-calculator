@@ -1,111 +1,72 @@
 import tkinter as tk
+from tkinter import messagebox
+import matplotlib.pyplot as plt
 
 def calculate_bmi():
     try:
         weight = float(weight_entry.get())
         height = float(height_entry.get())
-        bmi = round(weight / (height ** 2), 2)
+
+        if weight <= 0 or height <= 0:
+            raise ValueError
+
+        bmi = weight / (height ** 2)
+        bmi = round(bmi, 2)
 
         if bmi < 18.5:
             result = "Underweight"
-            color = "#3498db"
+            color = "blue"
         elif bmi < 25:
             result = "Normal"
-            color = "#2ecc71"
+            color = "green"
         elif bmi < 30:
             result = "Overweight"
-            color = "#f1c40f"
+            color = "orange"
         else:
             result = "Obese"
-            color = "#e74c3c"
+            color = "red"
 
-        result_label.config(text=f"BMI: {bmi}\n{result}", fg=color)
+        result_label.config(text=f"BMI: {bmi}\nResult: {result}", fg=color)
 
-        draw_circle(bmi, color)
+        show_graph(bmi)
 
     except ValueError:
-        result_label.config(text="Please enter valid numbers", fg="red")
+        messagebox.showerror("Invalid Input", "Please enter valid numbers.")
 
-def draw_circle(bmi, color):
-    canvas.delete("all")
+def show_graph(bmi):
+    categories = ["Underweight", "Normal", "Overweight", "Obese"]
+    ranges = [18.5, 25, 30, 40]
 
-    # Background circle
-    canvas.create_oval(20, 20, 180, 180, outline="#444", width=12)
+    plt.figure(figsize=(6,4))
+    plt.bar(categories, ranges, color=["blue", "green", "orange", "red"])
+    plt.axhline(y=bmi, color="black", linestyle="--", label=f"Your BMI: {bmi}")
 
-    # Limit BMI to 40 for display
-    angle = min(bmi / 40 * 360, 360)
+    plt.ylabel("BMI Value")
+    plt.title("BMI Category Chart")
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
 
-    # BMI Arc
-    canvas.create_arc(
-        20, 20, 180, 180,
-        start=90,
-        extent=-angle,
-        style="arc",
-        outline=color,
-        width=12
-    )
+# ---------------- UI ----------------
 
-    # Center text
-    canvas.create_text(
-        100, 100,
-        text=str(bmi),
-        fill="white",
-        font=("Arial", 16, "bold")
-    )
-
-# Window
 root = tk.Tk()
 root.title("BMI Calculator")
-root.geometry("350x480")
-root.config(bg="#1e1e2f")
+root.geometry("300x300")
+root.resizable(False, False)
 
-# Title
-tk.Label(
-    root,
-    text="BMI Calculator",
-    font=("Arial", 18, "bold"),
-    fg="white",
-    bg="#1e1e2f"
-).pack(pady=15)
+tk.Label(root, text="BMI Calculator", font=("Arial", 16, "bold")).pack(pady=10)
 
-# Weight
-tk.Label(root, text="Weight (kg)", fg="white", bg="#1e1e2f").pack()
-weight_entry = tk.Entry(root, font=("Arial", 12))
-weight_entry.pack(pady=5)
+tk.Label(root, text="Weight (kg):").pack()
+weight_entry = tk.Entry(root)
+weight_entry.pack()
 
-# Height
-tk.Label(root, text="Height (m)", fg="white", bg="#1e1e2f").pack()
-height_entry = tk.Entry(root, font=("Arial", 12))
-height_entry.pack(pady=5)
+tk.Label(root, text="Height (m):").pack()
+height_entry = tk.Entry(root)
+height_entry.pack()
 
-# Button
-tk.Button(
-    root,
-    text="Calculate BMI",
-    command=calculate_bmi,
-    bg="#9b59b6",
-    fg="white",
-    font=("Arial", 12),
-    width=15
-).pack(pady=15)
+tk.Button(root, text="Calculate BMI", command=calculate_bmi, bg="#4CAF50", fg="white").pack(pady=10)
 
-# Result
-result_label = tk.Label(
-    root,
-    text="",
-    font=("Arial", 14, "bold"),
-    bg="#1e1e2f"
-)
-result_label.pack(pady=10)
-
-# Circular Graph Canvas
-canvas = tk.Canvas(
-    root,
-    width=200,
-    height=200,
-    bg="#2c2c3c",
-    highlightthickness=0
-)
-canvas.pack(pady=10)
+result_label = tk.Label(root, text="", font=("Arial", 12))
+result_label.pack()
 
 root.mainloop()

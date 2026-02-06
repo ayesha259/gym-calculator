@@ -14,3 +14,4 @@ else:
 
 print("BMI:", round(bmi, 2))
 print("Result:", result)
+
