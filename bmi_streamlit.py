@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 st.set_page_config(page_title="BMI Calculator", layout="centered")
 
 st.title("BMI Calculator")
+st.write("App loaded successfully - ready for input")
 
 weight = st.number_input("Weight (kg)", min_value=0.0, format="%.2f")
 height = st.number_input("Height (m)", min_value=0.0, format="%.2f")
