@@ -1,15 +1,19 @@
 import streamlit as st
-import matplotlib.pyplot as plt
+import pandas as pd
 
 st.set_page_config(page_title="BMI Calculator", layout="centered")
 
 st.title("BMI Calculator")
-st.write("App loaded successfully - ready for input")
 
-weight = st.number_input("Weight (kg)", min_value=0.0, format="%.2f")
-height = st.number_input("Height (m)", min_value=0.0, format="%.2f")
+col1, col2 = st.columns(2)
 
-if st.button("Calculate BMI"):
+with col1:
+    weight = st.number_input("Weight (kg)", min_value=0.0, format="%.2f")
+
+with col2:
+    height = st.number_input("Height (m)", min_value=0.0, format="%.2f")
+
+if st.button("Calculate BMI", use_container_width=True):
     if weight <= 0 or height <= 0:
         st.error("Please enter positive numbers for weight and height.")
     else:
@@ -18,28 +22,30 @@ if st.button("Calculate BMI"):
 
         if bmi < 18.5:
             result = "Underweight"
-            color = "blue"
+            color = "🔵"
         elif bmi < 25:
             result = "Normal"
-            color = "green"
+            color = "🟢"
         elif bmi < 30:
             result = "Overweight"
-            color = "orange"
+            color = "🟠"
         else:
             result = "Obese"
-            color = "red"
+            color = "🔴"
 
-        st.markdown(f"**BMI:** <span style='color:{color}'>{bmi}</span>", unsafe_allow_html=True)
-        st.markdown(f"**Result:** <span style='color:{color}'>{result}</span>", unsafe_allow_html=True)
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("Your BMI", bmi)
+        with col2:
+            st.metric("Category", result)
 
-        categories = ["Underweight", "Normal", "Overweight", "Obese"]
-        ranges = [18.5, 25, 30, 40]
-
-        fig, ax = plt.subplots(figsize=(6, 4))
-        ax.bar(categories, ranges, color=["blue", "green", "orange", "red"])
-        ax.axhline(y=bmi, color="black", linestyle="--", label=f"Your BMI: {bmi}")
-        ax.set_ylabel("BMI Value")
-        ax.set_title("BMI Category Chart")
-        ax.legend()
-        st.pyplot(fig)
-        plt.close(fig)
+        # BMI Chart Data
+        bmi_data = {
+            "Category": ["Underweight", "Normal", "Overweight", "Obese"],
+            "Max BMI": [18.5, 25, 30, 40],
+            "Color": ["blue", "green", "orange", "red"]
+        }
+        df = pd.DataFrame(bmi_data)
+        
+        st.bar_chart(df.set_index("Category")["Max BMI"], use_container_width=True)
+        st.success(f"✅ Your BMI is {bmi} - You are {result}!")
